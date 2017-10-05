@@ -6,22 +6,17 @@ import com.amazonaws.services.dynamodbv2.model.*;
 import com.amazonaws.services.dynamodbv2.transactions.TransactionManager;
 import com.pluralsight.dynamodb.domain.Comment;
 import com.pluralsight.dynamodb.domain.Item;
-import com.pluralsight.dynamodb.domain.Order;
 
 public class Utils {
 
     public static void createTables(AmazonDynamoDB dynamoDB) {
         DynamoDBMapper dynamoDBMapper = new DynamoDBMapper(dynamoDB);
 
-        createTable(Item.class, dynamoDBMapper, dynamoDB, false);
-        createTable(Comment.class, dynamoDBMapper, dynamoDB, false);
-        createTable(Order.class, dynamoDBMapper, dynamoDB, true);
+        createTable(Item.class, dynamoDBMapper, dynamoDB);
+        createTable(Comment.class, dynamoDBMapper, dynamoDB);
     }
 
-    private static void createTable(Class<?> itemClass,
-                                    DynamoDBMapper dynamoDBMapper,
-                                    AmazonDynamoDB dynamoDB,
-                                    boolean enableStream) {
+    private static void createTable(Class<?> itemClass, DynamoDBMapper dynamoDBMapper, AmazonDynamoDB dynamoDB) {
         CreateTableRequest createTableRequest = dynamoDBMapper.generateCreateTableRequest(itemClass);
         createTableRequest.withProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
 
@@ -35,13 +30,6 @@ public class Utils {
             for (LocalSecondaryIndex lsi : createTableRequest.getLocalSecondaryIndexes()) {
                 lsi.withProjection(new Projection().withProjectionType("ALL"));
             }
-
-        if (enableStream) {
-            StreamSpecification streamSpecification = new StreamSpecification();
-            streamSpecification.setStreamEnabled(true);
-            streamSpecification.setStreamViewType(StreamViewType.NEW_IMAGE);
-            createTableRequest.withStreamSpecification(streamSpecification);
-        }
 
         if (!tableExists(dynamoDB, createTableRequest))
             dynamoDB.createTable(createTableRequest);

@@ -51,11 +51,4 @@ com.almworks.sqlite4java.SQLiteException: [-91] cannot load library: com.almwork
 
 Check if you have libraries for your platform in `target/lib`.
 
-# Lambda function
-
-Source code for DynamoDB/CloudSearch integration is located in the `cloud_search_lambda` folder.
-
-* lambda.js - contains lambda function that synchronizes DynamoDB with CloudSearch
-* test_item.json - contains test data for the lambda function
-
 
