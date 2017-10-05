@@ -45,4 +45,39 @@ public class CommentDao {
 	public List<Comment> getAll() {
 		return mapper.scan(Comment.class, new DynamoDBScanExpression());
 	}
+	
+	public List<Comment> getAllForItem(String itemId) {
+		Comment comment = new Comment();
+		comment.setItemId(itemId);
+		
+		DynamoDBQueryExpression<Comment>queryExpression
+			= new DynamoDBQueryExpression<Comment>()
+			.withHashKeyValues(comment);
+		
+		return mapper.query(Comment.class, queryExpression);
+	}
+	
+	public List<Comment> allForItemWithRating(String itemId, int minRating) {
+		Comment comment = new Comment();
+		comment.setItemId(itemId);
+
+		DynamoDBQueryExpression<Comment> queryExpression = new DynamoDBQueryExpression<Comment>()
+				.withHashKeyValues(comment)
+				.withRangeKeyCondition(
+						"rating",
+						new Condition()
+							.withComparisonOperator(ComparisonOperator.GE)
+							.withAttributeValueList(
+									new AttributeValue().withN(
+											Integer.toString(minRating)
+									)
+							)
+				);
+			
+		return mapper.query(Comment.class, queryExpression);
+	
+		
+	}
+	
+	
 }
