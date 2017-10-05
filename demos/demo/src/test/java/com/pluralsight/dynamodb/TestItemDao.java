@@ -9,21 +9,21 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 
-public class testItemDao {
-	static AmazonDynamoDB dynamoDB;
-	static ItemDao itemDao;
-	
-	@Before
-	public void before() {
-		dynamoDB = DynamoDBEmbedded.create().amazonDynamoDB();
-		Utils.createTables(dynamoDB);
-		itemDao = new ItemDao(dynamoDB);
-	}
-	
-	@Test
-	public void testDynamoDB() {
-		Item item = itemDao.put(new Item());
-		assertNotNull(itemDao.get(item.getId()));
-	}
- 
+public class TestItemDao {
+
+    static AmazonDynamoDB dynamodb;
+    static ItemDao itemDao;
+
+    @Before
+    public void before() {
+        dynamodb = DynamoDBEmbedded.create().amazonDynamoDB();
+        Utils.createTables(dynamodb);
+        itemDao = new ItemDao(dynamodb);
+    }
+
+    @Test
+    public void testDynamoDB() {
+        Item item = itemDao.put(new Item());
+        assertNotNull(itemDao.get(item.getId()));
+    }
 }
