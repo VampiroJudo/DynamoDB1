@@ -9,38 +9,34 @@ import com.pluralsight.dynamodb.domain.Item;
 import java.util.List;
 
 public class ItemDao {
-
-    private final DynamoDBMapper mapper;
-
-    public ItemDao(AmazonDynamoDB dynamoDb) {
-        this.mapper = new DynamoDBMapper(dynamoDb);
+	private final AmazonDynamoDB dynamoDB;
+	
+    public ItemDao(AmazonDynamoDB dynamoDB) {
+    		this.dynamoDB = dynamoDB;
     }
-
-    public Item put(Item item) {
-        mapper.save(item, DynamoDBMapperConfig
-                .builder()
-                .withSaveBehavior(DynamoDBMapperConfig.SaveBehavior.CLOBBER)
-                .build());
-
-        return item;
-    }
-
-    public Item get(String id) {
-        return mapper.load(Item.class, id);
-    }
-
-    public void update(Item item) {
-        mapper.save(item);
-    }
-
-    public void delete(String id) {
-        Item item = new Item();
-        item.setId(id);
-
-        mapper.delete(item);
-    }
-
-    public List<Item> getAll() {
-        return mapper.scan(Item.class, new DynamoDBScanExpression());
-    }
+    
+    public void put(Item item) {
+    		Map<String, AttributeValue> itemMap = new HashMap<String, AttributeValue>();
+    		itemMap.put("id",
+    				new AttributeValue().withS(item.getId()));
+    		
+    		if (item.getName() != null)
+    			itemMap.put("name",
+    					new AttributeValue().withS(item.getName()));
+    		
+    		if (item.getDescription() != null)
+    			itemMap.put("description",
+    					new AttributeValue().withS(item.getDescription()));
+    		
+    		itemMap.put("totalRating",
+    				new AttributeValue().withN (
+    						Integer.String(item.getTotalRating())
+    				));
+    		
+    		itemMap.put("totalComments",
+    				new AttributeValue().withN(
+    						Integer.toString(item.getTotalComments())
+    				));
+    	}
+    
 }
