@@ -37,6 +37,10 @@ public class ItemDao {
     				new AttributeValue().withN(
     						Integer.toString(item.getTotalComments())
     				));
-    	}
+    		
+    		PutItemRequest putItemRequest = new PutItemRequest( tablename: "Items", itemMap);
+    		dynamoDB.putItem(putItemRequest);
+    }
+    
     
 }
