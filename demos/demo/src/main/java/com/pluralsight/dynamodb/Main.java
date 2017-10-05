@@ -30,7 +30,7 @@ public class Main {
         Utils.createTables(client);
         Utils.verifyOrCreateTransactionManager(client);
 
-        fullTextDemo();
+        transactionDemo(client);
     }
 
     private static void fullTextDemo() {

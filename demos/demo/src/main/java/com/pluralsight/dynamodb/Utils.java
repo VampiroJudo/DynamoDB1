@@ -58,35 +58,19 @@ public class Utils {
         }
     }
 
-    private static boolean tableExists(AmazonDynamoDB dynamoDB, CreateTableRequest createTableRequest) {
-        try {
-            dynamoDB.describeTable(createTableRequest.getTableName());
-            return true;
-        } catch (ResourceNotFoundException ex) {
-            return false;
-        }
-    }
-
     public static void verifyOrCreateTransactionManager(AmazonDynamoDB client) {
-
-        try {
-            TransactionManager.verifyOrCreateTransactionTable(
-                    client,
-                    "Transactions",
-                    1L, 1L,
-                    10 * 60L
-            );
-
-            TransactionManager.verifyOrCreateTransactionImagesTable(
-                    client,
-                    "TransactionImages",
-                    1L, 1L,
-                    10 * 60L
-            );
-        } catch (InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
-
-
-    }
+    		
+    		try {
+    			TransactionManager.verifyOrCreateTransactionImagesTable(
+    					client,
+    					"Transactions",
+    					1L, 1L,
+    					10 * 60L
+    		);
+    			
+    	} catch (InterruptedException ex) {
+    		throw new RuntimeException(ex);
+    	}
+   }
+    
 }

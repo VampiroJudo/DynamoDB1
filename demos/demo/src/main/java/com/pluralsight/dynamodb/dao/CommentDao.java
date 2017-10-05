@@ -15,15 +15,34 @@ import com.pluralsight.dynamodb.domain.Item;
 import java.util.List;
 
 public class CommentDao {
-	private DynamoDBMapper mapper;
+	private final DynamoDBMapper mapper;
+	private	final TransactionManager txManager;
 	
 	public CommentDao(AmazonDynamoDB dynamoDB) {
-		mapper = new DynamoDBMapper(dynamoDB);
+		this.mapper = new DynamoDBMapper(dynamoDB);
+		this.txManager = new TransactionManager(dynamoDB, "Transactions",
+												"TransactionImages");
+				
 	}
 	
 	public Comment put(Comment comment) {
-		mapper.save(comment);
+		Transaction transaction = txManager.newTransaction();
+		
+		transaction.save(comment);
+		
+		Item item = new Item();
+		item.setId(comment.getItemId());
+		
+		item = transaction.load(item);
+		
+		item.setTotalComments(item.getTotalComments() + 1);
+		item.setTotalRating(item.getTotalRating() + comment.getRating());
+		transaction.save(item);
+		
+		transaction.commit();
+		transaction.delete();
 		return comment;
+	
 	}
 	
 	public Comment get(String itemId, String messageId) {
