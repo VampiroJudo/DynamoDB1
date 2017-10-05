@@ -76,8 +76,18 @@ public class CommentDao {
 			
 		return mapper.query(Comment.class, queryExpression);
 	
-		
 	}
 	
-	
+	public List<Comment> allForUser(String userId) {
+		Comment comment = new comment();
+		comment.setUserId();
+		DynamoDBQueryExpression<Comment> queryExpression
+		 = new DynamoDBQueryExpression<Comment>()
+		 	.withHashKeyValues(comment)
+			.withConsistentRead(false);
+			
+     return mapper.query(Comment.class, queryExpression);
+     
+		 
+	}
 }
