@@ -35,13 +35,14 @@ public class Utils {
             for (LocalSecondaryIndex lsi : createTableRequest.getLocalSecondaryIndexes()) {
                 lsi.withProjection(new Projection().withProjectionType("ALL"));
             }
-
+        
         if (enableStream) {
-            StreamSpecification streamSpecification = new StreamSpecification();
-            streamSpecification.setStreamEnabled(true);
-            streamSpecification.setStreamViewType(StreamViewType.NEW_IMAGE);
-            createTableRequest.withStreamSpecification(streamSpecification);
+        		StreamSpecification streamSpecification = new StreamSpecification();
+        		streamSpecification.setStreamEnabled(true);
+        		streamSpecification.setStreamViewType(StreamViewType.NEW_IMAGE);
+        		createTableRequest.withStreamSpecification(streamSpecification);
         }
+       
 
         if (!tableExists(dynamoDB, createTableRequest))
             dynamoDB.createTable(createTableRequest);
