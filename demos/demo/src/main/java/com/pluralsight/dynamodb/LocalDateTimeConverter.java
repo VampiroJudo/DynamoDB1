@@ -7,16 +7,15 @@ import java.time.format.DateTimeFormatter;
 
 public class LocalDateTimeConverter implements DynamoDBTypeConverter<String, LocalDateTime> {
 
-   private static final DateTimeFormatter formatter = 
-		   DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-   
-   @Override
-   public String convert(LocalDateTime localDateTime) {
-	   return localDateTime.format(formatter);
-   }
-   
-   @Override
-   public LocalDateTime unconvert(String s) {
-	   return LocalDateTime.parse(s, formatter);
-   }
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
+    @Override
+    public String convert(LocalDateTime object) {
+        return object.format(formatter);
+    }
+
+    @Override
+    public LocalDateTime unconvert(String object) {
+        return LocalDateTime.parse(object, formatter);
+    }
 }

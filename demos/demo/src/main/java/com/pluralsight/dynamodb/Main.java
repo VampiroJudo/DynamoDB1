@@ -11,18 +11,22 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.pluralsight.dynamodb.dao.CommentDao;
 import com.pluralsight.dynamodb.dao.ItemDao;
+import com.pluralsight.dynamodb.dao.OrderDao;
 import com.pluralsight.dynamodb.domain.Comment;
 import com.pluralsight.dynamodb.domain.Item;
+import com.pluralsight.dynamodb.domain.Order;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Main {
 
-    public static void main(String... args) {
+    public static void main(String... args) throws Exception {
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
                 .withRegion(Regions.US_EAST_1)
                 .build();
@@ -30,7 +34,21 @@ public class Main {
         Utils.createTables(client);
         Utils.verifyOrCreateTransactionManager(client);
 
-        transactionDemo(client);
+        streamDemo(client);
+    }
+
+    private static void streamDemo(AmazonDynamoDB dynamoDB) throws Exception {
+        OrderDao orderDao = new OrderDao(dynamoDB);
+        Random random = new Random();
+        while (true) {
+            Order order = new Order();
+            order.setItemIds(Arrays.asList("1", "2"));
+            order.setTotalPrice(random.nextInt(1000));
+
+            orderDao.put(order);
+            System.out.println("Created new order: " + order);
+            Thread.sleep(1000);
+        }
     }
 
     private static void fullTextDemo() {

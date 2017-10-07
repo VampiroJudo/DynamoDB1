@@ -6,17 +6,22 @@ import com.amazonaws.services.dynamodbv2.model.*;
 import com.amazonaws.services.dynamodbv2.transactions.TransactionManager;
 import com.pluralsight.dynamodb.domain.Comment;
 import com.pluralsight.dynamodb.domain.Item;
+import com.pluralsight.dynamodb.domain.Order;
 
 public class Utils {
 
     public static void createTables(AmazonDynamoDB dynamoDB) {
         DynamoDBMapper dynamoDBMapper = new DynamoDBMapper(dynamoDB);
 
-        createTable(Item.class, dynamoDBMapper, dynamoDB);
-        createTable(Comment.class, dynamoDBMapper, dynamoDB);
+        createTable(Item.class, dynamoDBMapper, dynamoDB, false);
+        createTable(Comment.class, dynamoDBMapper, dynamoDB, false);
+        createTable(Order.class, dynamoDBMapper, dynamoDB, true);
     }
 
-    private static void createTable(Class<?> itemClass, DynamoDBMapper dynamoDBMapper, AmazonDynamoDB dynamoDB) {
+    private static void createTable(Class<?> itemClass,
+                                    DynamoDBMapper dynamoDBMapper,
+                                    AmazonDynamoDB dynamoDB,
+                                    boolean enableStream) {
         CreateTableRequest createTableRequest = dynamoDBMapper.generateCreateTableRequest(itemClass);
         createTableRequest.withProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
 
@@ -30,6 +35,13 @@ public class Utils {
             for (LocalSecondaryIndex lsi : createTableRequest.getLocalSecondaryIndexes()) {
                 lsi.withProjection(new Projection().withProjectionType("ALL"));
             }
+
+        if (enableStream) {
+            StreamSpecification streamSpecification = new StreamSpecification();
+            streamSpecification.setStreamEnabled(true);
+            streamSpecification.setStreamViewType(StreamViewType.NEW_IMAGE);
+            createTableRequest.withStreamSpecification(streamSpecification);
+        }
 
         if (!tableExists(dynamoDB, createTableRequest))
             dynamoDB.createTable(createTableRequest);
@@ -58,19 +70,35 @@ public class Utils {
         }
     }
 
+    private static boolean tableExists(AmazonDynamoDB dynamoDB, CreateTableRequest createTableRequest) {
+        try {
+            dynamoDB.describeTable(createTableRequest.getTableName());
+            return true;
+        } catch (ResourceNotFoundException ex) {
+            return false;
+        }
+    }
+
     public static void verifyOrCreateTransactionManager(AmazonDynamoDB client) {
-    		
-    		try {
-    			TransactionManager.verifyOrCreateTransactionImagesTable(
-    					client,
-    					"Transactions",
-    					1L, 1L,
-    					10 * 60L
-    		);
-    			
-    	} catch (InterruptedException ex) {
-    		throw new RuntimeException(ex);
-    	}
-   }
-    
+
+        try {
+            TransactionManager.verifyOrCreateTransactionTable(
+                    client,
+                    "Transactions",
+                    1L, 1L,
+                    10 * 60L
+            );
+
+            TransactionManager.verifyOrCreateTransactionImagesTable(
+                    client,
+                    "TransactionImages",
+                    1L, 1L,
+                    10 * 60L
+            );
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+
+
+    }
 }
