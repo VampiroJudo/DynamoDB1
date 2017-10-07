@@ -37,18 +37,18 @@ public class Main {
         streamDemo(client);
     }
 
-    private static void streamDemo(AmazonDynamoDB dynamoDB) throws Exception {
-        OrderDao orderDao = new OrderDao(dynamoDB);
-        Random random = new Random();
-        while (true) {
-            Order order = new Order();
-            order.setItemIds(Arrays.asList("1", "2"));
-            order.setTotalPrice(random.nextInt(1000));
-
-            orderDao.put(order);
-            System.out.println("Created new order: " + order);
-            Thread.sleep(1000);
-        }
+    private static void streamDemo(AmazonDynamoDB dynamoDB) throws Exception  {
+    		OrderDao orderDao = new OrderDao(dynamoDB);
+    		Random random = new Random();
+    		while(true) {
+    			Order order = new Order();
+    			order.setItemIds(Arrays.asList("1", "2"));
+    			order.setTotalPrice(random.nextInt(1000));
+    			
+    			orderDao.put(order);
+    			System.out.println("Created new order: " + order);
+    			Thread.sleep(1000);
+    		}
     }
 
     private static void fullTextDemo() {
